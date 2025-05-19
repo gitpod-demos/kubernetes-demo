@@ -1,0 +1,39 @@
+{
+    // Displayed name
+    "name": "Go + Docker + KinD",
+  
+    // Compose file that defines the three services
+    "dockerComposeFile": "docker-compose.yml",
+  
+    // Which compose service VS Code attaches to
+    "service": "dev",
+    // "workspaceFolder": "/workspace",
+  
+    // Dev Container “features” install Go, Docker CLI, and kubectl for us
+    "features": {
+      "ghcr.io/devcontainers/features/go:1": {
+        "version": "1.22"
+      },
+      "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+      // "ghcr.io/devcontainers/features/kubectl:1": {
+      //   "version": "v1.30.0"
+      // }
+    },
+  
+    // Copy KinD’s kube-config out of the kind service
+    // "postStartCommand": "docker cp kind:/root/.kube/config $HOME/.kube/config && sed -i 's/127.0.0.1/kind/' $HOME/.kube/config",
+  
+    // Quick sanity check right after containers finish building
+    "postCreateCommand": "go version && docker version && kubectl version --client=true",
+  
+    // Recommended VS Code extensions
+    "customizations": {
+      "vscode": {
+        "extensions": [
+          "golang.go",
+          "ms-azuretools.vscode-docker",
+          "ms-kubernetes-tools.vscode-kubernetes-tools"
+        ]
+      }
+    }
+  }
