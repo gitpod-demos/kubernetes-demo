@@ -1,0 +1,36 @@
+services:
+  kind:
+    name: "Kind"
+    description: "Lightweight local Kubernetes cluster"
+    triggeredBy:
+      - postEnvironmentStart
+    commands:
+      start: |
+        export KIND_EXPERIMENTAL_DOCKER_NETWORK=$(docker inspect -f '{{range $k,$v := .NetworkSettings.Networks}}{{println $k}}{{end}}' "$(hostname)" | head -n1)
+        # Create the cluster only if it doesn't already exist
+        if ! kind get clusters | grep -q '^dev$'; then
+          kind create cluster --name dev --config .gitpod/kind-config.yaml --wait 300s
+        fi
+        kind export kubeconfig --name dev --internal
+        # Keep the service process alive so Gitpod treats it as running
+        sleep infinity
+      ready: |
+        kind get clusters | grep -q '^dev$'
+      stop: |
+        kind delete cluster --name dev || true
+
+  registry:
+    name: "Docker Registry"
+    description: "Local container registry on port 5000"
+    triggeredBy:
+      - postEnvironmentStart
+    commands:
+      start: |
+        WORKSPACE_NET=$(docker inspect -f '{{range $k,$v := .NetworkSettings.Networks}}{{println $k}}{{end}}' "$(hostname)" | head -n1)
+        docker run --rm -p 5000:5000 --name registry --network "$WORKSPACE_NET" registry:2
+      ready: |
+        curl -fsSL http://registry:5000/v2/ > /dev/null
+      stop: |
+        docker stop registry || true
+
+tasks: {}

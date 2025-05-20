@@ -10,61 +10,23 @@ services:
     volumes:
       - ..:/workspace:cached    # project files
     #   - /var/run/docker.sock:/var/run/docker.sock  # share host Docker
-    # networks: [devnet]
-    # depends_on: [registry, kind]
+    # networks: [devnet, kind]
     depends_on: [registry]
     command: sleep infinity
 
   # ------------------------------------------------------------------
   # Private Docker Registry
   # ------------------------------------------------------------------
-  registry:
-    image: registry:2
-    restart: always
-    ports:
-      - "5000:5000"             # localhost:5000 outside the devcontainer
-    networks: [devnet]
+#   registry:
+#     image: registry:2
+#     restart: always
+#     ports:
+#       - "5000:5000"             # localhost:5000 outside the devcontainer
+#     networks: [devnet]
 
-  # ------------------------------------------------------------------
-  # KinD cluster running inside its own DinD service
-  # ------------------------------------------------------------------
-  # kind:
-  #   image: docker:24.0-dind
-  #   privileged: true
-  #   container_name: kind
-  #   environment:
-  #     DOCKER_TLS_CERTDIR: ""    # disable TLS inside DinD
-  #   volumes:
-  #     - kind_data:/var/lib/docker        # persist cluster state
-  #     - ./kind-entrypoint.sh:/kind-entrypoint.sh:ro
-  #   command: ["sh", "/kind-entrypoint.sh"]
-  #   networks: [devnet]
-
-
-  # kind:
-  #   image: alpine:3.20                   # light base; we install KinD at runtime
-  #   privileged: false
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   networks: [devnet]
-  #   container_name: kind
-  #   ports: ["35973:35973"]
-  #   entrypoint: >
-  #     /bin/sh -c '
-  #       apk add --no-cache curl docker-cli &&
-  #       curl -Lo /usr/local/bin/kind https://kind.sigs.k8s.io/dl/v0.22.0/kind-linux-amd64 &&
-  #       chmod +x /usr/local/bin/kind &&
-  #       kind create cluster --name dev --wait 5m --image kindest/node:v1.30.0 &&
-  #       tail -f /dev/null
-  #     '
-  #   # healthcheck so dev waits until the cluster exists
-  #   healthcheck:
-  #     test: ["CMD", "docker", "ps", "-q", "-f", "name=dev-control-plane"]
-  #     interval: 10s
-  #     retries: 15
-
-networks:
-  devnet:
+# networks:
+#   devnet:
+#   kind:
 
 volumes:
   kind_data:
