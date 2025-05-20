@@ -16,10 +16,8 @@ services:
         kubectl rollout status -n ingress-nginx deployment/ingress-nginx-controller --timeout=300s
         gitpod environment port open 80 --name Ingress
         kubectl port-forward --namespace ingress-nginx svc/ingress-nginx-controller 80:80
-        # Keep the service process alive so Gitpod treats it as running
-        # sleep infinity
       ready: |
-        kind get clusters | grep -q '^dev$'
+        curl -fsSL http://localhost:80/ > /dev/null
       stop: |
         kind delete cluster --name dev || true
 

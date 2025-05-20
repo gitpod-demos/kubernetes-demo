@@ -1,32 +1,9 @@
 services:
-  # ------------------------------------------------------------------
-  # Main development container
-  # ------------------------------------------------------------------
   dev:
     build:
       context: .
       dockerfile: Dockerfile
-    privileged: true           # needed for Docker-in-Docker socket mount
+    privileged: true
     volumes:
       - ..:/workspace:cached    # project files
-    #   - /var/run/docker.sock:/var/run/docker.sock  # share host Docker
-    # networks: [devnet, kind]
-    # depends_on: [registry]
     command: sleep infinity
-
-  # ------------------------------------------------------------------
-  # Private Docker Registry
-  # ------------------------------------------------------------------
-#   registry:
-#     image: registry:2
-#     restart: always
-#     ports:
-#       - "5000:5000"             # localhost:5000 outside the devcontainer
-#     networks: [devnet]
-
-# networks:
-#   devnet:
-#   kind:
-
-volumes:
-  kind_data:
