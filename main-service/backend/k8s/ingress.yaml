@@ -5,8 +5,7 @@ metadata:
 spec:
   ingressClassName: nginx          # nginx-ingress controller
   rules:
-  - host: localhost                # adapt to your DNS / hosts file
-    http:
+  - http:
       paths:
       - path: /
         pathType: Prefix           # literal prefix “/” matches everything
