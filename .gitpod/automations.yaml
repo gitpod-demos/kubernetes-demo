@@ -1,7 +1,7 @@
 services:
   kind:
-    name: "Kind"
-    description: "Lightweight local Kubernetes cluster"
+    name: "Kubernetes Cluster"
+    description: "Local Kind cluster"
     triggeredBy:
       - postEnvironmentStart
     commands:
@@ -13,7 +13,9 @@ services:
         fi
         kind export kubeconfig --name dev --internal
         kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
-        kubectl port-forward --namespace ingress-nginx svc/ingress-nginx-controller 8081:80
+        kubectl rollout status -n ingress-nginx deployment/ingress-nginx-controller --timeout=300s
+        gitpod environment port open 80 --name Ingress
+        kubectl port-forward --namespace ingress-nginx svc/ingress-nginx-controller 80:80
         # Keep the service process alive so Gitpod treats it as running
         # sleep infinity
       ready: |
@@ -23,7 +25,7 @@ services:
 
   registry:
     name: "Docker Registry"
-    description: "Local container registry on port 5000"
+    description: "Local container registry"
     triggeredBy:
       - postEnvironmentStart
     commands:
