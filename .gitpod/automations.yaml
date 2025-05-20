@@ -17,7 +17,7 @@ services:
         gitpod environment port open 80 --name Ingress
         kubectl port-forward --namespace ingress-nginx svc/ingress-nginx-controller 80:80
       ready: |
-        curl -fsSL http://localhost:80/ > /dev/null
+        curl -fsSL http://localhost:80/healthz > /dev/null
       stop: |
         kind delete cluster --name dev || true
 
