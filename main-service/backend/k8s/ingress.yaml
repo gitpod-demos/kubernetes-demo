@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo-ingress
+spec:
+  ingressClassName: nginx          # nginx-ingress controller
+  rules:
+  - host: localhost                # adapt to your DNS / hosts file
+    http:
+      paths:
+      - path: /
+        pathType: Prefix           # literal prefix “/” matches everything
+        backend:
+          service:
+            name: demo-service
+            port:
+              number: 80

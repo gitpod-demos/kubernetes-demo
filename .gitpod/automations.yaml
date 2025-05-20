@@ -12,8 +12,10 @@ services:
           kind create cluster --name dev --config .gitpod/kind-config.yaml --wait 300s
         fi
         kind export kubeconfig --name dev --internal
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+        kubectl port-forward --namespace ingress-nginx svc/ingress-nginx-controller 8081:80
         # Keep the service process alive so Gitpod treats it as running
-        sleep infinity
+        # sleep infinity
       ready: |
         kind get clusters | grep -q '^dev$'
       stop: |
@@ -33,4 +35,15 @@ services:
       stop: |
         docker stop registry || true
 
-tasks: {}
+tasks:
+  build-and-deploy:
+    name: "Build and Deploy"
+    triggeredBy:
+      - manual
+    description: "Builds the Go app, creates Docker image, and deploys to Kubernetes"
+    command: |
+      cd main-service/backend
+      go build -o bin/app
+      docker build -t localhost:5000/demo-service:latest .
+      docker push localhost:5000/demo-service:latest
+      kubectl apply -f k8s/
