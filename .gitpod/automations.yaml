@@ -6,16 +6,20 @@ services:
       - postEnvironmentStart
     commands:
       start: |
-        export KIND_EXPERIMENTAL_DOCKER_NETWORK=$(docker inspect -f '{{range $k,$v := .NetworkSettings.Networks}}{{println $k}}{{end}}' "$(hostname)" | head -n1)
+        # export KIND_EXPERIMENTAL_DOCKER_NETWORK=$(docker inspect -f '{{range $k,$v := .NetworkSettings.Networks}}{{println $k}}{{end}}' "$(hostname)" | head -n1)
         # Create the cluster only if it doesn't already exist
         if ! kind get clusters | grep -q '^dev$'; then
           kind create cluster --name dev --config .gitpod/kind-config.yaml --wait 300s
         fi
-        kind export kubeconfig --name dev --internal
+        kind export kubeconfig --name dev 
+        # && sed -i "s/0.0.0.0/127.0.0.1/" /$HOME/.kube/config
+        # kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/deploy-ingress-nginx.yaml
         kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
         kubectl rollout status -n ingress-nginx deployment/ingress-nginx-controller --timeout=300s
         gitpod environment port open 80 --name Ingress
-        kubectl port-forward --namespace ingress-nginx svc/ingress-nginx-controller 80:80
+        # cloud-provider-kind
+        sleep infinity
+        #kubectl port-forward --namespace ingress-nginx svc/ingress-nginx-controller 80:80
       ready: |
         curl -fsSL http://localhost:80/healthz > /dev/null
       stop: |
@@ -28,10 +32,9 @@ services:
       - postEnvironmentStart
     commands:
       start: |
-        WORKSPACE_NET=$(docker inspect -f '{{range $k,$v := .NetworkSettings.Networks}}{{println $k}}{{end}}' "$(hostname)" | head -n1)
-        docker run --rm -p 5000:5000 --name registry --network "$WORKSPACE_NET" registry:2
+        docker run --rm -p 5000:5000 --name registry --network kind registry:2
       ready: |
-        curl -fsSL http://registry:5000/v2/ > /dev/null
+        curl -fsSL http://localhost:5000/v2/ > /dev/null
       stop: |
         docker stop registry || true
 

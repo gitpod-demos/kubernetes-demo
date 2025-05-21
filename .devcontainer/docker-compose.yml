@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
     privileged: true
+    network_mode: "host"
     volumes:
       - ..:/workspace:cached    # project files
     command: sleep infinity
+
